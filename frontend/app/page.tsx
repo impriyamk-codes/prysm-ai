@@ -10,9 +10,10 @@ type Message = {
 export default function Home() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleSend() {
-    if (!input.trim()) return;
+    if (!input.trim() || isLoading) return;
 
     const currentInput = input;
 
@@ -23,6 +24,7 @@ export default function Home() {
 
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
+    setIsLoading(true);
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
@@ -50,6 +52,8 @@ export default function Home() {
       };
 
       setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -63,7 +67,11 @@ export default function Home() {
           </div>
 
           <button
-            onClick={() => setMessages([])}
+            onClick={() => {
+              setMessages([]);
+              setInput("");
+              setIsLoading(false);
+            }}
             className="rounded-full border border-zinc-700 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-900"
           >
             New Chat
@@ -100,6 +108,12 @@ export default function Home() {
                   {message.content}
                 </div>
               ))}
+
+              {isLoading && (
+                <div className="mr-auto max-w-2xl rounded-2xl border border-zinc-800 bg-zinc-950 px-5 py-4 text-sm text-zinc-400">
+                  Prysm is thinking...
+                </div>
+              )}
             </div>
           )}
 
@@ -110,14 +124,17 @@ export default function Home() {
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleSend();
               }}
-              className="flex-1 bg-transparent px-4 py-3 text-sm outline-none placeholder:text-zinc-600"
+              disabled={isLoading}
+              className="flex-1 bg-transparent px-4 py-3 text-sm outline-none placeholder:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
               placeholder="Ask Prysm anything..."
             />
+
             <button
               onClick={handleSend}
-              className="rounded-xl bg-white px-5 py-3 text-sm font-medium text-black"
+              disabled={isLoading}
+              className="rounded-xl bg-white px-5 py-3 text-sm font-medium text-black disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Send
+              {isLoading ? "Thinking" : "Send"}
             </button>
           </div>
         </section>
