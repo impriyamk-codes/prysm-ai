@@ -11,21 +11,46 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
 
-  function handleSend() {
+  async function handleSend() {
     if (!input.trim()) return;
+
+    const currentInput = input;
 
     const userMessage: Message = {
       role: "user",
-      content: input,
+      content: currentInput,
     };
 
-    const assistantMessage: Message = {
-      role: "assistant",
-      content: "Prysm response will appear here soon.",
-    };
-
-    setMessages((prev) => [...prev, userMessage, assistantMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: currentInput,
+        }),
+      });
+
+      const data = await res.json();
+
+      const assistantMessage: Message = {
+        role: "assistant",
+        content: data.reply,
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch {
+      const errorMessage: Message = {
+        role: "assistant",
+        content: "Could not connect to Prysm backend.",
+      };
+
+      setMessages((prev) => [...prev, errorMessage]);
+    }
   }
 
   return (
