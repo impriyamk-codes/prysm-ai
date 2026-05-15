@@ -1,6 +1,7 @@
 type Message = {
   role: "user" | "assistant";
   content: string;
+  timestamp: string;
 };
 
 type ChatMessagesProps = {
@@ -8,7 +9,10 @@ type ChatMessagesProps = {
   isLoading: boolean;
 };
 
-export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
+export function ChatMessages({
+  messages,
+  isLoading,
+}: ChatMessagesProps) {
   if (messages.length === 0) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center text-center">
@@ -21,8 +25,9 @@ export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
         </h2>
 
         <p className="mt-6 max-w-2xl text-lg text-zinc-400">
-          Prysm helps students and developers manage projects, understand
-          documents, organize tasks, and interact with their workflow using AI.
+          Prysm helps students and developers manage projects,
+          understand documents, organize tasks, and interact with
+          their workflow using AI.
         </p>
       </div>
     );
@@ -33,19 +38,33 @@ export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
       {messages.map((message, index) => (
         <div
           key={index}
-          className={`max-w-2xl rounded-2xl px-5 py-4 text-sm ${
+          className={`max-w-2xl rounded-2xl px-5 py-4 ${
             message.role === "user"
               ? "ml-auto bg-white text-black"
               : "mr-auto border border-zinc-800 bg-zinc-950 text-zinc-200"
           }`}
         >
-          {message.content}
+          <p className="text-sm leading-relaxed">
+            {message.content}
+          </p>
+
+          <p
+            className={`mt-2 text-xs ${
+              message.role === "user"
+                ? "text-zinc-700"
+                : "text-zinc-500"
+            }`}
+          >
+            {message.timestamp}
+          </p>
         </div>
       ))}
 
       {isLoading && (
-        <div className="mr-auto max-w-2xl rounded-2xl border border-zinc-800 bg-zinc-950 px-5 py-4 text-sm text-zinc-400">
-          Prysm is thinking...
+        <div className="mr-auto max-w-2xl rounded-2xl border border-zinc-800 bg-zinc-950 px-5 py-4">
+          <p className="text-sm text-zinc-400">
+            Prysm is thinking...
+          </p>
         </div>
       )}
     </div>

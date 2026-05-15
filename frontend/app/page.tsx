@@ -9,7 +9,15 @@ import { ChatInput } from "@/components/chat/ChatInput";
 type Message = {
   role: "user" | "assistant";
   content: string;
+  timestamp: string;
 };
+
+function getCurrentTime() {
+  return new Date().toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 export default function Home() {
   const [input, setInput] = useState("");
@@ -24,6 +32,7 @@ export default function Home() {
     const userMessage: Message = {
       role: "user",
       content: currentInput,
+      timestamp: getCurrentTime(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -46,14 +55,15 @@ export default function Home() {
       const assistantMessage: Message = {
         role: "assistant",
         content: data.reply,
+        timestamp: getCurrentTime(),
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch {
       const errorMessage: Message = {
         role: "assistant",
-        content:
-          "Could not connect to Prysm backend.",
+        content: "Could not connect to Prysm backend.",
+        timestamp: getCurrentTime(),
       };
 
       setMessages((prev) => [...prev, errorMessage]);
@@ -74,10 +84,7 @@ export default function Home() {
         <ChatHeader onNewChat={handleNewChat} />
 
         <section className="mt-10 flex flex-1 flex-col">
-          <ChatMessages
-            messages={messages}
-            isLoading={isLoading}
-          />
+          <ChatMessages messages={messages} isLoading={isLoading} />
 
           <ChatInput
             input={input}
