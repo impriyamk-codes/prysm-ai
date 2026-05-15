@@ -41,7 +41,13 @@ def chat(request: ChatRequest):
             "reply": response.text
         }
 
-    except Exception as e:
+    except Exception:
+        mock_reply = (
+            "I’m currently running in mock mode because the AI provider quota is unavailable. "
+            f"You said: \"{user_message}\". "
+            "Once the API quota is fixed, I’ll respond with real AI-generated assistance."
+        )
+
         return {
-            "reply": "Prysm AI provider is connected, but the current API quota is unavailable. For now, I can run in mock mode while you continue building the app."
+            "reply": mock_reply
         }
